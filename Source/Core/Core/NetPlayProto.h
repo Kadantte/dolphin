@@ -1,6 +1,5 @@
 // Copyright 2013 Dolphin Emulator Project
-// Licensed under GPLv2+
-// Refer to the license.txt file included.
+// SPDX-License-Identifier: GPL-2.0-or-later
 
 #pragma once
 
@@ -36,9 +35,11 @@ struct NetSettings
   bool m_DSPHLE;
   bool m_DSPEnableJIT;
   bool m_WriteToMemcard;
+  bool m_RAMOverrideEnable;
   u32 m_Mem1Size;
   u32 m_Mem2Size;
   DiscIO::Region m_FallbackRegion;
+  bool m_AllowSDWrites;
   bool m_CopyWiiSave;
   bool m_OCEnable;
   float m_OCFactor;
@@ -85,7 +86,7 @@ struct NetSettings
   float m_ArbitraryMipmapDetectionThreshold;
   bool m_EnableGPUTextureDecoding;
   bool m_DeferEFBCopies;
-  bool m_EFBAccessTileSize;
+  int m_EFBAccessTileSize;
   bool m_EFBAccessDeferInvalidation;
 
   bool m_StrictSettingsSync;
@@ -95,6 +96,7 @@ struct NetSettings
   bool m_SyncAllWiiSaves;
   std::array<int, 4> m_WiimoteExtension;
   bool m_GolfMode;
+  bool m_UseFMA;
 
   // These aren't sent over the network directly
   bool m_IsHosting;
@@ -113,11 +115,6 @@ struct NetTraversalConfig
   bool use_traversal = false;
   std::string traversal_host;
   u16 traversal_port = 0;
-};
-
-struct Rpt : public std::vector<u8>
-{
-  u16 channel;
 };
 
 // messages
@@ -154,7 +151,7 @@ enum
   NP_MSG_STOP_GAME = 0xA2,
   NP_MSG_DISABLE_GAME = 0xA3,
   NP_MSG_GAME_STATUS = 0xA4,
-  NP_MSG_IPL_STATUS = 0xA5,
+  NP_MSG_CLIENT_CAPABILITIES = 0xA5,
   NP_MSG_HOST_INPUT_AUTHORITY = 0xA6,
   NP_MSG_POWER_BUTTON = 0xA7,
 
@@ -208,13 +205,15 @@ enum
   SYNC_CODES_FAILURE = 6,
 };
 
-constexpr u32 NETPLAY_LZO_IN_LEN = 1024 * 64;
-constexpr u32 NETPLAY_LZO_OUT_LEN = NETPLAY_LZO_IN_LEN + (NETPLAY_LZO_IN_LEN / 16) + 64 + 3;
 constexpr u32 MAX_NAME_LENGTH = 30;
 constexpr size_t CHUNKED_DATA_UNIT_SIZE = 16384;
-constexpr u8 CHANNEL_COUNT = 2;
-constexpr u8 DEFAULT_CHANNEL = 0;
-constexpr u8 CHUNKED_DATA_CHANNEL = 1;
+
+enum : u8
+{
+  DEFAULT_CHANNEL,
+  CHUNKED_DATA_CHANNEL,
+  CHANNEL_COUNT
+};
 
 struct WiimoteInput
 {

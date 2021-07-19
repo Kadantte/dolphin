@@ -1,6 +1,5 @@
 // Copyright 2017 Dolphin Emulator Project
-// Licensed under GPLv2+
-// Refer to the license.txt file included.
+// SPDX-License-Identifier: GPL-2.0-or-later
 
 #pragma once
 
@@ -24,7 +23,6 @@ namespace Config
 // Main.Core
 
 extern const Info<bool> MAIN_SKIP_IPL;
-extern const Info<bool> MAIN_LOAD_IPL_DUMP;
 extern const Info<PowerPC::CPUCore> MAIN_CPU_CORE;
 extern const Info<bool> MAIN_JIT_FOLLOW_BRANCH;
 extern const Info<bool> MAIN_FASTMEM;
@@ -48,8 +46,6 @@ extern const Info<std::string> MAIN_AGP_CART_A_PATH;
 extern const Info<std::string> MAIN_AGP_CART_B_PATH;
 extern const Info<std::string> MAIN_GCI_FOLDER_A_PATH_OVERRIDE;
 extern const Info<std::string> MAIN_GCI_FOLDER_B_PATH_OVERRIDE;
-extern const Info<bool> MAIN_CODE_SYNC_OVERRIDE;
-extern const Info<bool> MAIN_GCI_FOLDER_CURRENT_GAME_ONLY;
 extern const Info<int> MAIN_SLOT_A;
 extern const Info<int> MAIN_SLOT_B;
 extern const Info<int> MAIN_SERIAL_PORT_1;
@@ -58,7 +54,6 @@ Info<u32> GetInfoForSIDevice(u32 channel);
 Info<bool> GetInfoForAdapterRumble(u32 channel);
 Info<bool> GetInfoForSimulateKonga(u32 channel);
 extern const Info<bool> MAIN_WII_SD_CARD;
-extern const Info<bool> MAIN_WII_SD_CARD_WRITABLE;
 extern const Info<bool> MAIN_WII_KEYBOARD;
 extern const Info<bool> MAIN_WIIMOTE_CONTINUOUS_SCANNING;
 extern const Info<bool> MAIN_WIIMOTE_ENABLE_SPEAKER;
@@ -91,6 +86,7 @@ extern const Info<bool> MAIN_AUTO_DISC_CHANGE;
 extern const Info<bool> MAIN_ALLOW_SD_WRITES;
 extern const Info<bool> MAIN_ENABLE_SAVESTATES;
 extern const Info<DiscIO::Region> MAIN_FALLBACK_REGION;
+extern const Info<bool> MAIN_REAL_WII_REMOTE_REPEAT_REPORTS;
 
 // Main.DSP
 

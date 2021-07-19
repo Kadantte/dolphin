@@ -1,6 +1,5 @@
 // Copyright 2014 Dolphin Emulator Project
-// Licensed under GPLv2+
-// Refer to the license.txt file included.
+// SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "Common/Arm64Emitter.h"
 #include "Common/CommonTypes.h"
@@ -25,12 +24,12 @@ void JitArm64::sc(UGeckoInstruction inst)
   ARM64Reg WA = gpr.GetReg();
 
   LDR(IndexType::Unsigned, WA, PPC_REG, PPCSTATE_OFF(Exceptions));
-  ORR(WA, WA, 31, 0);  // Same as WA | EXCEPTION_SYSCALL
+  ORR(WA, WA, LogicalImm(EXCEPTION_SYSCALL, 32));
   STR(IndexType::Unsigned, WA, PPC_REG, PPCSTATE_OFF(Exceptions));
 
   gpr.Unlock(WA);
 
-  WriteExceptionExit(js.compilerPC + 4);
+  WriteExceptionExit(js.compilerPC + 4, false, true);
 }
 
 void JitArm64::rfi(UGeckoInstruction inst)
@@ -220,7 +219,7 @@ void JitArm64::bcctrx(UGeckoInstruction inst)
   ARM64Reg WA = gpr.GetReg();
 
   LDR(IndexType::Unsigned, WA, PPC_REG, PPCSTATE_OFF_SPR(SPR_CTR));
-  AND(WA, WA, 30, 29);  // Wipe the bottom 2 bits.
+  AND(WA, WA, LogicalImm(~0x3, 32));
 
   WriteExit(WA, inst.LK_3, js.compilerPC + 4);
 
@@ -266,7 +265,7 @@ void JitArm64::bclrx(UGeckoInstruction inst)
   }
 
   LDR(IndexType::Unsigned, WA, PPC_REG, PPCSTATE_OFF_SPR(SPR_LR));
-  AND(WA, WA, 30, 29);  // Wipe the bottom 2 bits.
+  AND(WA, WA, LogicalImm(~0x3, 32));
 
   if (inst.LK)
   {

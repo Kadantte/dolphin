@@ -1,6 +1,5 @@
 // Copyright 2008 Dolphin Emulator Project
-// Licensed under GPLv2+
-// Refer to the license.txt file included.
+// SPDX-License-Identifier: GPL-2.0-or-later
 
 #pragma once
 
@@ -304,6 +303,9 @@ inline void SetXER_OV(bool value)
   SetXER_SO(value);
 }
 
-void UpdateFPRF(double dvalue);
+void UpdateFPRFDouble(double dvalue);
+void UpdateFPRFSingle(float fvalue);
+
+void RoundingModeUpdated();
 
 }  // namespace PowerPC

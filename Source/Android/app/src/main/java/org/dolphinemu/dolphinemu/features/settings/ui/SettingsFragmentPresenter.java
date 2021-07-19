@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+
 package org.dolphinemu.dolphinemu.features.settings.ui;
 
 import android.content.Context;
@@ -17,6 +19,7 @@ import org.dolphinemu.dolphinemu.features.settings.model.IntSetting;
 import org.dolphinemu.dolphinemu.features.settings.model.LegacyBooleanSetting;
 import org.dolphinemu.dolphinemu.features.settings.model.LegacyIntSetting;
 import org.dolphinemu.dolphinemu.features.settings.model.LegacyStringSetting;
+import org.dolphinemu.dolphinemu.features.settings.model.PostProcessing;
 import org.dolphinemu.dolphinemu.features.settings.model.Settings;
 import org.dolphinemu.dolphinemu.features.settings.model.StringSetting;
 import org.dolphinemu.dolphinemu.features.settings.model.WiimoteProfileStringSetting;
@@ -120,7 +123,7 @@ public final class SettingsFragmentPresenter
   {
     if (!TextUtils.isEmpty(mGameID))
     {
-      mView.getActivity().setTitle("Game Settings: " + mGameID);
+      mView.getActivity().setTitle(mContext.getString(R.string.game_settings, mGameID));
     }
     ArrayList<SettingsItem> sl = new ArrayList<>();
 
@@ -216,8 +219,7 @@ public final class SettingsFragmentPresenter
         break;
 
       default:
-        mView.showToastMessage("Unimplemented menu");
-        return;
+        throw new UnsupportedOperationException("Unimplemented menu");
     }
 
     mSettingsList = sl;
@@ -262,6 +264,8 @@ public final class SettingsFragmentPresenter
             R.string.auto_disc_change, 0));
     sl.add(new PercentSliderSetting(mContext, FloatSetting.MAIN_EMULATION_SPEED,
             R.string.speed_limit, 0, 0, 200, "%"));
+    sl.add(new SingleChoiceSetting(mContext, IntSetting.MAIN_FALLBACK_REGION,
+            R.string.fallback_region, 0, R.array.regionEntries, R.array.regionValues));
     sl.add(new CheckBoxSetting(mContext, BooleanSetting.MAIN_ANALYTICS_ENABLED, R.string.analytics,
             0));
     sl.add(new RunRunnable(mContext, R.string.analytics_new_id, 0,
@@ -622,11 +626,17 @@ public final class SettingsFragmentPresenter
 
     int stereoModeValue = IntSetting.GFX_STEREO_MODE.getInt(mSettings);
     final int anaglyphMode = 3;
-    String subDir = stereoModeValue == anaglyphMode ? "Anaglyph" : null;
-    String[] shaderListEntries = getShaderList(subDir);
-    String[] shaderListValues = new String[shaderListEntries.length];
-    System.arraycopy(shaderListEntries, 0, shaderListValues, 0, shaderListEntries.length);
+    String[] shaderList = stereoModeValue == anaglyphMode ?
+            PostProcessing.getAnaglyphShaderList() : PostProcessing.getShaderList();
+
+    String[] shaderListEntries = new String[shaderList.length + 1];
+    shaderListEntries[0] = mContext.getString(R.string.off);
+    System.arraycopy(shaderList, 0, shaderListEntries, 1, shaderList.length);
+
+    String[] shaderListValues = new String[shaderList.length + 1];
     shaderListValues[0] = "";
+    System.arraycopy(shaderList, 0, shaderListValues, 1, shaderList.length);
+
     sl.add(new StringSingleChoiceSetting(mContext, StringSetting.GFX_ENHANCE_POST_SHADER,
             R.string.post_processing_shader, 0, shaderListEntries, shaderListValues));
 
@@ -662,46 +672,6 @@ public final class SettingsFragmentPresenter
     {
       sl.add(new SubmenuSetting(mContext, R.string.stereoscopy_submenu, MenuTag.STEREOSCOPY));
     }
-  }
-
-  private String[] getShaderList(String subDir)
-  {
-    try
-    {
-      String shadersPath =
-              DirectoryInitialization.getDolphinInternalDirectory() + "/Shaders";
-      if (!TextUtils.isEmpty(subDir))
-      {
-        shadersPath += "/" + subDir;
-      }
-
-      File file = new File(shadersPath);
-      File[] shaderFiles = file.listFiles();
-      if (shaderFiles != null)
-      {
-        String[] result = new String[shaderFiles.length + 1];
-        result[0] = mView.getActivity().getString(R.string.off);
-        for (int i = 0; i < shaderFiles.length; i++)
-        {
-          String name = shaderFiles[i].getName();
-          int extensionIndex = name.indexOf(".glsl");
-          if (extensionIndex > 0)
-          {
-            name = name.substring(0, extensionIndex);
-          }
-          result[i + 1] = name;
-        }
-
-        return result;
-      }
-    }
-    catch (Exception ex)
-    {
-      Log.debug("[Settings] Unable to find shader files");
-      // return empty list
-    }
-
-    return new String[]{};
   }
 
   private void addHackSettings(ArrayList<SettingsItem> sl)

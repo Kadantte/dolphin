@@ -26,6 +26,8 @@ add_library(core
   Config/MainSettings.h
   Config/NetplaySettings.cpp
   Config/NetplaySettings.h
+  Config/SessionSettings.cpp
+  Config/SessionSettings.h
   Config/SYSCONFSettings.cpp
   Config/SYSCONFSettings.h
   Config/UISettings.cpp
@@ -161,8 +163,6 @@ add_library(core
   HW/DSPLLE/DSPHost.cpp
   HW/DSPLLE/DSPLLE.cpp
   HW/DSPLLE/DSPLLE.h
-  HW/DSPLLE/DSPLLEGlobals.cpp
-  HW/DSPLLE/DSPLLEGlobals.h
   HW/DSPLLE/DSPSymbols.cpp
   HW/DSPLLE/DSPSymbols.h
   HW/DVD/DVDInterface.cpp
@@ -406,6 +406,8 @@ add_library(core
   Movie.h
   NetPlayClient.cpp
   NetPlayClient.h
+  NetPlayCommon.cpp
+  NetPlayCommon.h
   NetPlayServer.cpp
   NetPlayServer.h
   NetworkCaptureLogger.cpp

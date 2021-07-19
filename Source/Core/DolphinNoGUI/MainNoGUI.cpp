@@ -1,6 +1,5 @@
 // Copyright 2008 Dolphin Emulator Project
-// Licensed under GPLv2+
-// Refer to the license.txt file included.
+// SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "DolphinNoGUI/Platform.h"
 
@@ -96,6 +95,12 @@ void Host_RequestRenderWindowSize(int width, int height)
 bool Host_RendererHasFocus()
 {
   return s_platform->IsWindowFocused();
+}
+
+bool Host_RendererHasFullFocus()
+{
+  // Mouse capturing isn't implemented
+  return Host_RendererHasFocus();
 }
 
 bool Host_RendererIsFullscreen()

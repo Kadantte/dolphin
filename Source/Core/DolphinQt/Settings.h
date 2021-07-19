@@ -1,6 +1,5 @@
 // Copyright 2015 Dolphin Emulator Project
-// Licensed under GPLv2+
-// Refer to the license.txt file included.
+// SPDX-License-Identifier: GPL-2.0-or-later
 
 #pragma once
 
@@ -100,6 +99,8 @@ public:
   // Graphics
   void SetHideCursor(bool hide_cursor);
   bool GetHideCursor() const;
+  void SetLockCursor(bool lock_cursor);
+  bool GetLockCursor() const;
   void SetKeepWindowOnTop(bool top);
   bool IsKeepWindowOnTopEnabled() const;
 
@@ -168,6 +169,7 @@ signals:
   void MetadataRefreshCompleted();
   void AutoRefreshToggled(bool enabled);
   void HideCursorChanged();
+  void LockCursorChanged();
   void KeepWindowOnTopChanged(bool top);
   void VolumeChanged(int volume);
   void NANDRefresh();
@@ -189,6 +191,7 @@ signals:
   void AutoUpdateTrackChanged(const QString& mode);
   void FallbackRegionChanged(const DiscIO::Region& region);
   void AnalyticsToggled(bool enabled);
+  void ReleaseDevices();
   void DevicesChanged();
   void SDCardInsertionChanged(bool inserted);
   void USBKeyboardConnectionChanged(bool connected);

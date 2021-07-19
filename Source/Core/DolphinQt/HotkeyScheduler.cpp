@@ -1,6 +1,5 @@
 // Copyright 2017 Dolphin Emulator Project
-// Licensed under GPLv2+
-// Refer to the license.txt file included.
+// SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "DolphinQt/HotkeyScheduler.h"
 
@@ -212,6 +211,10 @@ void HotkeyScheduler::Run()
       // Exit
       if (IsHotkey(HK_EXIT))
         emit ExitHotkey();
+
+      // Unlock Cursor
+      if (IsHotkey(HK_UNLOCK_CURSOR))
+        emit UnlockCursor();
 
       auto& settings = Settings::Instance();
 

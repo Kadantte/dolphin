@@ -1,6 +1,5 @@
 // Copyright 2008 Dolphin Emulator Project
-// Licensed under GPLv2+
-// Refer to the license.txt file included.
+// SPDX-License-Identifier: GPL-2.0-or-later
 
 #pragma once
 
@@ -31,11 +30,6 @@
 #include "Common/Flag.h"
 #include "Common/Inline.h"
 #include "Common/Logging/Log.h"
-
-// XXX: Replace this with std::is_trivially_copyable<T> once we stop using volatile
-// on things that are put in savestates, as volatile types are not trivially copyable.
-template <typename T>
-constexpr bool IsTriviallyCopyable = std::is_trivially_copyable<std::remove_volatile_t<T>>::value;
 
 // Wrapper class
 class PointerWrap
@@ -181,13 +175,13 @@ public:
     DoArray(x.data(), static_cast<u32>(x.size()));
   }
 
-  template <typename T, typename std::enable_if_t<IsTriviallyCopyable<T>, int> = 0>
+  template <typename T, typename std::enable_if_t<std::is_trivially_copyable_v<T>, int> = 0>
   void DoArray(T* x, u32 count)
   {
     DoVoid(x, count * sizeof(T));
   }
 
-  template <typename T, typename std::enable_if_t<!IsTriviallyCopyable<T>, int> = 0>
+  template <typename T, typename std::enable_if_t<!std::is_trivially_copyable_v<T>, int> = 0>
   void DoArray(T* x, u32 count)
   {
     for (u32 i = 0; i < count; ++i)
@@ -230,7 +224,7 @@ public:
   template <typename T>
   void Do(T& x)
   {
-    static_assert(IsTriviallyCopyable<T>, "Only sane for trivially copyable types");
+    static_assert(std::is_trivially_copyable_v<T>, "Only sane for trivially copyable types");
     // Note:
     // Usually we can just use x = **ptr, etc.  However, this doesn't work
     // for unions containing BitFields (long story, stupid language rules)

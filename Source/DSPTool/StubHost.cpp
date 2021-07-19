@@ -1,6 +1,5 @@
 // Copyright 2017 Dolphin Emulator Project
-// Licensed under GPLv2+
-// Refer to the license.txt file included.
+// SPDX-License-Identifier: GPL-2.0-or-later
 
 // Stub implementation of the Host_* callbacks for DSPTool. These implementations
 // do nothing except return default values when required.
@@ -36,6 +35,10 @@ void Host_RequestRenderWindowSize(int, int)
 {
 }
 bool Host_RendererHasFocus()
+{
+  return false;
+}
+bool Host_RendererHasFullFocus()
 {
   return false;
 }

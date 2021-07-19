@@ -1,6 +1,5 @@
 // Copyright 2008 Dolphin Emulator Project
-// Licensed under GPLv2+
-// Refer to the license.txt file included.
+// SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "VideoCommon/Fifo.h"
 
@@ -139,7 +138,7 @@ void Shutdown()
 void ExitGpuLoop()
 {
   // This should break the wait loop in CPU thread
-  CommandProcessor::fifo.bFF_GPReadEnable = false;
+  CommandProcessor::fifo.bFF_GPReadEnable.store(0, std::memory_order_relaxed);
   FlushGpu();
 
   // Terminate GPU thread loop
@@ -297,10 +296,10 @@ void RunGpuLoop()
   AsyncRequests::GetInstance()->SetEnable(true);
   AsyncRequests::GetInstance()->SetPassthrough(false);
 
-  s_gpu_mainloop.Run(
-      [] {
-        const SConfig& param = SConfig::GetInstance();
+  const SConfig& param = SConfig::GetInstance();
 
+  s_gpu_mainloop.Run(
+      [&param] {
         // Run events from the CPU thread.
         AsyncRequests::GetInstance()->PullEvents();
 
@@ -327,7 +326,8 @@ void RunGpuLoop()
           CommandProcessor::SetCPStatusFromGPU();
 
           // check if we are able to run this buffer
-          while (!CommandProcessor::IsInterruptWaiting() && fifo.bFF_GPReadEnable &&
+          while (!CommandProcessor::IsInterruptWaiting() &&
+                 fifo.bFF_GPReadEnable.load(std::memory_order_relaxed) &&
                  fifo.CPReadWriteDistance.load(std::memory_order_relaxed) && !AtBreakpoint())
           {
             if (param.bSyncGPU && s_sync_ticks.load() < param.iSyncGpuMinDistance)
@@ -415,8 +415,9 @@ void GpuMaySleep()
 bool AtBreakpoint()
 {
   CommandProcessor::SCPFifoStruct& fifo = CommandProcessor::fifo;
-  return fifo.bFF_BPEnable && (fifo.CPReadPointer.load(std::memory_order_relaxed) ==
-                               fifo.CPBreakpoint.load(std::memory_order_relaxed));
+  return fifo.bFF_BPEnable.load(std::memory_order_relaxed) &&
+         (fifo.CPReadPointer.load(std::memory_order_relaxed) ==
+          fifo.CPBreakpoint.load(std::memory_order_relaxed));
 }
 
 void RunGpu()
@@ -446,8 +447,9 @@ static int RunGpuOnCpu(int ticks)
   CommandProcessor::SCPFifoStruct& fifo = CommandProcessor::fifo;
   bool reset_simd_state = false;
   int available_ticks = int(ticks * SConfig::GetInstance().fSyncGpuOverclock) + s_sync_ticks.load();
-  while (fifo.bFF_GPReadEnable && fifo.CPReadWriteDistance.load(std::memory_order_relaxed) &&
-         !AtBreakpoint() && available_ticks >= 0)
+  while (fifo.bFF_GPReadEnable.load(std::memory_order_relaxed) &&
+         fifo.CPReadWriteDistance.load(std::memory_order_relaxed) && !AtBreakpoint() &&
+         available_ticks >= 0)
   {
     if (s_use_deterministic_gpu_thread)
     {
